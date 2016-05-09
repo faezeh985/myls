@@ -6,6 +6,7 @@ import time
 import collections
 import operator
 
+
 def parse_my_arg (args):
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="show this help message and exit" ,nargs='?', default='.')

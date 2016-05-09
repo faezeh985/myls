@@ -6,6 +6,7 @@ import os
 import time
 import collections
 import operator
+import stack
 
 
 def parse_my_arg (args):
@@ -25,10 +26,10 @@ def main():
     args = parse_my_arg(sys.argv[1:])
     items = os.listdir(args.directory)
     result = []
-    stack=[]
+
     if args.recursive:
         aroot = args.directory
-        result = my_tree(aroot,args,stack,result)
+        result = my_tree(aroot,args,result)
     else:
         for item in items:
             lis = collections.defaultdict(str)
@@ -52,7 +53,7 @@ def main():
     print_result(result,args)
 
    
-def my_tree(aroot,args,stack,result):
+def my_tree(aroot,args,result,stack=stack.Stack()):
     while True:
         items = os.listdir(aroot)
         for item in items:   
@@ -60,7 +61,7 @@ def my_tree(aroot,args,stack,result):
             fullitem = os.path.join(aroot,item)
             if os.path.isdir(fullitem):
                 if not item.startswith('.') or args.hidden:
-                    stack.append(fullitem)
+                    stack.push(fullitem)
             else:
                 if args.hidden:               
                     lis['name'] =aroot + "/" + item
@@ -74,7 +75,7 @@ def my_tree(aroot,args,stack,result):
                 lis['root'] = aroot.lstrip(args.directory)
                 result.append(lis)
 
-        if len(stack)<1:
+        if stack.length()<1:
             return result  
         else:
             aroot = stack.pop()    

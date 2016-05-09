@@ -5,13 +5,13 @@ class Stack(object):
         self.lst = lst
 
     def top(self):
-        if len(self.lst)>0:
+        if len(self.lst) > 0:
             return self.lst[len(self.lst)-1]
         else:
             return None
 
     def pop(self):
-        if len(self.lst)>0:
+        if len(self.lst) > 0:
             return self.lst.pop()
         else:
             return None
@@ -19,5 +19,5 @@ class Stack(object):
     def length(self):
         return len(self.lst)
 
-    def push(self,x):
+    def push(self, x):
         return self.lst.append(x)

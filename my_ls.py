@@ -10,8 +10,7 @@ import operator
 
 def parse_my_arg (args):
     parser = argparse.ArgumentParser()
-    parser.add_argument("directory", help="show this help message and exit" ,nargs='?', default='.')
-                        
+    parser.add_argument("directory", help="show this help message and exit" ,nargs='?', default='.')                   
     parser.add_argument("-H" ,"--hidden",help=" show hidden files [default: off]",
                        action = "store_true")
     parser.add_argument("-s","--sizes", help=" show sizes [default: off]" , action = "store_true")
@@ -72,6 +71,7 @@ def my_tree(aroot,args,stack,result):
                     lis['size'] = os.path.getsize(fullitem)    
                 if args.modified or args.ordered=='modified' or args.ordered=='m' :
                     lis['modified'] = os.path.getmtime(fullitem)
+                lis['root'] = aroot.lstrip(args.directory)
                 result.append(lis)
 
         if len(stack)<1:
@@ -80,25 +80,38 @@ def my_tree(aroot,args,stack,result):
             aroot = stack.pop()    
             
 def print_result(result,args):
-    if args.ordered=='name' or args.ordered=='n':
-       result.sort(key=operator.itemgetter('name'))
+    if args.recursive:
+        if args.ordered=='name' or args.ordered=='n':
+            second_arg = 'name'
+        if args.ordered=='size' or args.ordered=='s':
+            second_arg = 'size'
+        if args.ordered=='modified' or args.ordered=='m':
+            second_arg = 'modified'
+        result.sort(key=operator.itemgetter('root',second_arg))
+    else:
+        if args.ordered=='name' or args.ordered=='n':
+           result.sort(key=operator.itemgetter('name'))
        
-    if args.ordered=='size' or args.ordered=='s':
-        result.sort(key=operator.itemgetter('size'))   
+        if args.ordered=='size' or args.ordered=='s':
+            result.sort(key=operator.itemgetter('size'))   
 
-    if args.ordered=='modified' or args.ordered=='m':
-        result.sort(key=operator.itemgetter('modified'))
-    number = 0  
+        if args.ordered=='modified' or args.ordered=='m':
+            result.sort(key=operator.itemgetter('modified'))
+    number = 0
+    root = result[0]['root']  
     for dic in result:
         dic['name'] = dic['name'].lstrip("./")
         if dic['name'] != "":   
-            strh = ""
+            strh = "    "
             if args.modified:
                 dic['modified'] = time.ctime(dic['modified'])
                 strh += "{modified:^25}"
             if args.sizes:
                 strh += "{size:^10}"
             strh += "{name:>}"
+            if root != dic['root']:
+                root = dic['root']
+                print("**",root,":")
             print(strh.format(**dic))
             number += 1
     print(number, "files")   
